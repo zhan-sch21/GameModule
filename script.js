@@ -517,33 +517,62 @@ function selectAnswer(answerIndex) {
     feedbackIcon.textContent = isCorrect ? '✅' : '❌';
     feedbackText.textContent = question.explanation;
     
-    // ПРИНУДИТЕЛЬНОЕ ОТОБРАЖЕНИЕ
-    feedback.style.display = 'block';
-    feedback.style.visibility = 'visible';
-    feedback.style.opacity = '1';
+    // ПРИНУДИТЕЛЬНОЕ ПЕРЕОПРЕДЕЛЕНИЕ СТИЛЕЙ
+    feedback.style.cssText = `
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 1000 !important;
+    `;
     feedback.classList.remove('hidden');
 
-    // ИСПРАВЛЕННАЯ УСТАНОВКА ОБРАБОТЧИКА
-    console.log('Setting up next button handler...');
+    // ПРИНУДИТЕЛЬНОЕ ПЕРЕОПРЕДЕЛЕНИЕ СТИЛЕЙ КНОПКИ
+    nextBtn.style.cssText = `
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: all !important;
+        cursor: pointer !important;
+        position: relative !important;
+        z-index: 1001 !important;
+    `;
+
+    // ПРОСТАЯ И НАДЕЖНАЯ УСТАНОВКА ОБРАБОТЧИКА
+    console.log('Setting next button handler for question:', gameState.currentQuestion);
     
-    // Удаляем старые обработчики и добавляем новый
-    nextBtn.replaceWith(nextBtn.cloneNode(true));
-    const newNextBtn = document.getElementById('next-btn');
-    
-    newNextBtn.onclick = function() {
-        console.log('Next button clicked!');
+    // Полная переустановка обработчика
+    nextBtn.onclick = null; // Очищаем старые обработчики
+    nextBtn.addEventListener('click', function nextButtonHandler() {
+        console.log('Next button clicked! Current question:', gameState.currentQuestion);
+        nextQuestion();
+    }, { once: true }); // { once: true } чтобы избежать дублирования
+
+    // Дублируем через onclick для надежности
+    nextBtn.onclick = function() {
+        console.log('Next button clicked via onclick');
         nextQuestion();
     };
+
+    console.log('Next button setup complete - styles and handlers applied');
     
-    // Дополнительная проверка через EventListener
-    newNextBtn.addEventListener('click', function() {
-        console.log('Next button clicked via addEventListener');
-        nextQuestion();
-    });
-
-    console.log('Next button setup complete');
+    // Дополнительная проверка через 100ms
+    setTimeout(() => {
+        const computedStyle = window.getComputedStyle(feedback);
+        console.log('Final feedback styles:', {
+            display: computedStyle.display,
+            visibility: computedStyle.visibility,
+            opacity: computedStyle.opacity
+        });
+        
+        const btnComputedStyle = window.getComputedStyle(nextBtn);
+        console.log('Final button styles:', {
+            display: btnComputedStyle.display,
+            pointerEvents: btnComputedStyle.pointerEvents,
+            cursor: btnComputedStyle.cursor
+        });
+    }, 100);
 }
-
 function nextQuestion() {
     console.log('nextQuestion called! Current question:', gameState.currentQuestion);
     
