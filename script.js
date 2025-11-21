@@ -516,25 +516,32 @@ function selectAnswer(answerIndex) {
     feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
     feedbackIcon.textContent = isCorrect ? '✅' : '❌';
     feedbackText.textContent = question.explanation;
+    
+    // ПРИНУДИТЕЛЬНОЕ ОТОБРАЖЕНИЕ
+    feedback.style.display = 'block';
+    feedback.style.visibility = 'visible';
+    feedback.style.opacity = '1';
     feedback.classList.remove('hidden');
 
-    // ДИАГНОСТИКА
-    console.log('Setting next button handler...');
-    console.log('Next button element:', nextBtn);
-    console.log('nextQuestion function:', typeof nextQuestion);
+    // ИСПРАВЛЕННАЯ УСТАНОВКА ОБРАБОТЧИКА
+    console.log('Setting up next button handler...');
     
-    // Установка обработчика
-    nextBtn.onclick = function() {
+    // Удаляем старые обработчики и добавляем новый
+    nextBtn.replaceWith(nextBtn.cloneNode(true));
+    const newNextBtn = document.getElementById('next-btn');
+    
+    newNextBtn.onclick = function() {
         console.log('Next button clicked!');
         nextQuestion();
     };
     
-    // Принудительно покажем фидбек
-    feedback.style.display = 'block';
-    feedback.style.visibility = 'visible';
-    feedback.style.opacity = '1';
-    
-    console.log('Feedback setup complete');
+    // Дополнительная проверка через EventListener
+    newNextBtn.addEventListener('click', function() {
+        console.log('Next button clicked via addEventListener');
+        nextQuestion();
+    });
+
+    console.log('Next button setup complete');
 }
 
 function nextQuestion() {
@@ -700,3 +707,37 @@ function registerServiceWorker() {
 // Глобальные функции для HTML
 window.startLevel = startLevel;
 window.selectAnswer = selectAnswer;
+
+// Добавьте в конец script.js
+window.debugNextButton = function() {
+    const nextBtn = document.getElementById('next-btn');
+    console.log('Debug next button:', nextBtn);
+    console.log('onclick:', nextBtn.onclick);
+    
+    // Принудительно вызовем nextQuestion
+    alert('Принудительный вызов nextQuestion');
+    nextQuestion();
+};
+
+// Добавим временную кнопку для теста
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = 'ТЕСТ: Принудительно Продолжить';
+        testBtn.style.position = 'fixed';
+        testBtn.style.bottom = '10px';
+        testBtn.style.right = '10px';
+        testBtn.style.zIndex = '9999';
+        testBtn.style.background = 'orange';
+        testBtn.style.color = 'white';
+        testBtn.style.padding = '10px';
+        testBtn.onclick = function() {
+            if (typeof nextQuestion === 'function') {
+                nextQuestion();
+            } else {
+                alert('nextQuestion не найдена');
+            }
+        };
+        document.body.appendChild(testBtn);
+    }, 3000);
+});
