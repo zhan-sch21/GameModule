@@ -511,102 +511,97 @@ function selectAnswer(answerIndex) {
     const feedback = document.getElementById('feedback');
     const feedbackIcon = document.getElementById('feedback-icon');
     const feedbackText = document.getElementById('feedback-text');
-    const nextBtn = document.getElementById('next-btn');
 
     feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
     feedbackIcon.textContent = isCorrect ? '✅' : '❌';
     feedbackText.textContent = question.explanation;
-    
-    // ПРИНУДИТЕЛЬНОЕ ПЕРЕОПРЕДЕЛЕНИЕ СТИЛЕЙ
-    feedback.style.cssText = `
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        z-index: 1000 !important;
-    `;
     feedback.classList.remove('hidden');
 
-    // ПРИНУДИТЕЛЬНОЕ ПЕРЕОПРЕДЕЛЕНИЕ СТИЛЕЙ КНОПКИ
-    nextBtn.style.cssText = `
-        display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        pointer-events: all !important;
-        cursor: pointer !important;
-        position: relative !important;
-        z-index: 1001 !important;
-    `;
-
-    // ПРОСТАЯ И НАДЕЖНАЯ УСТАНОВКА ОБРАБОТЧИКА
-    console.log('Setting next button handler for question:', gameState.currentQuestion);
-    
-    // Полная переустановка обработчика
-    nextBtn.onclick = null; // Очищаем старые обработчики
-    nextBtn.addEventListener('click', function nextButtonHandler() {
-        console.log('Next button clicked! Current question:', gameState.currentQuestion);
-        nextQuestion();
-    }, { once: true }); // { once: true } чтобы избежать дублирования
-
-    // Дублируем через onclick для надежности
-    nextBtn.onclick = function() {
-        console.log('Next button clicked via onclick');
-        nextQuestion();
-    };
-
-    console.log('Next button setup complete - styles and handlers applied');
-    
-    // Дополнительная проверка через 100ms
-    setTimeout(() => {
-        const computedStyle = window.getComputedStyle(feedback);
-        console.log('Final feedback styles:', {
-            display: computedStyle.display,
-            visibility: computedStyle.visibility,
-            opacity: computedStyle.opacity
-        });
-        
-        const btnComputedStyle = window.getComputedStyle(nextBtn);
-        console.log('Final button styles:', {
-            display: btnComputedStyle.display,
-            pointerEvents: btnComputedStyle.pointerEvents,
-            cursor: btnComputedStyle.cursor
-        });
-    }, 100);
+    document.getElementById('next-btn').onclick = nextQuestion;
 }
+
 function nextQuestion() {
-    console.log('nextQuestion called! Current question:', gameState.currentQuestion);
-    
     gameState.currentQuestion++;
     gameState.selectedAnswer = null;
     gameState.showFeedback = false;
 
-    console.log('Next question index:', gameState.currentQuestion);
-    console.log('Total questions:', gameState.currentLevel.questions.length);
-
     if (gameState.currentQuestion < gameState.currentLevel.questions.length) {
-        console.log('Rendering next question');
         renderQuestion();
     } else {
-        console.log('Finishing level');
         finishLevel();
     }
 }
 
-finishLevel()
-function showResults(score, expEarned, bonusExp, levelCompleted, timeSpent) {
+async function finishLevel() {
+    const level = gameState.currentLevel;
+    const totalQuestions = level.questions.length;
+    const scorePercentage = Math.round((gameState.score / totalQuestions) * 100);
+    const expEarned = gameState.score * GAME_CONFIG.expPerCorrectAnswer;
+    const isPerfect = gameState.score === totalQuestions;
+    const bonusExp = isPerfect ? GAME_CONFIG.bonusExpPerfect : 0;
+    const totalExp = expEarned + bonusExp + level.reward_points;
+
+    const timeSpent = Math.round((Date.now() - gameState.startTime) / 1000);
+    window.gameProgress.totalPlayTime = (window.gameProgress.totalPlayTime || 0) + timeSpent;
+
+    // Сохраняем результат в бэкенд
+    await saveAttemptToBackend(level.id, gameState.score, 'completed');
+
+    const levelProgress = window.gameProgress.levels[level.id] || {
+        completed: false,
+        bestScore: 0,
+        playCount: 0,
+        totalTime: 0
+    };
+
+    levelProgress.playCount = (levelProgress.playCount || 0) + 1;
+    levelProgress.totalTime = (levelProgress.totalTime || 0) + timeSpent;
+    levelProgress.lastScore = scorePercentage;
+
+    if (scorePercentage >= GAME_CONFIG.requiredScore) {
+        levelProgress.completed = true;
+        if (scorePercentage > levelProgress.bestScore) {
+            levelProgress.bestScore = scorePercentage;
+        }
+        if (!window.gameProgress.levels[level.id]?.completed) {
+            window.gameProgress.completedLevels++;
+            checkAchievements('first_level');
+        }
+    }
+
+    window.gameProgress.levels[level.id] = levelProgress;
+    window.gameProgress.totalExp += totalExp;
+
+    if (isPerfect) checkAchievements('perfect_score');
+    if (timeSpent < 120) checkAchievements('fast_learner');
+    if (window.gameProgress.totalExp >= 500) checkAchievements('exp_500');
+    if (window.gameProgress.completedLevels >= 3) checkAchievements('all_levels'); // 3 уровня из бэкенда
+
+    const newUserLevel = Math.floor(window.gameProgress.totalExp / GAME_CONFIG.expPerLevel) + 1;
+    if (newUserLevel > window.gameProgress.userLevel) {
+        window.gameProgress.userLevel = newUserLevel;
+        showNotification(`🎉 Поздравляем! Вы достигли ${newUserLevel} уровня!`);
+    }
+
+    saveProgress();
+
+    // 🔊 Звук при успешном прохождении
+    if (scorePercentage >= GAME_CONFIG.requiredScore) {
+        playLevelCompleteSound();
+    }
+
+    showResults(scorePercentage, totalExp, bonusExp, isPerfect, timeSpent);
+}
+
+function showResults(score, expEarned, bonusExp, isPerfect, timeSpent) {
     const levelProgress = window.gameProgress.levels[gameState.currentLevel.id];
     const bestScore = levelProgress?.bestScore || 0;
 
-    document.getElementById('result-icon').textContent = levelCompleted ? '🎉' : '😔';
-    document.getElementById('result-title').textContent = levelCompleted ? 'Уровень пройден!' : 'Попробуйте еще раз';
+    document.getElementById('result-icon').textContent = score >= GAME_CONFIG.requiredScore ? '🎉' : '😔';
+    document.getElementById('result-title').textContent =
+        score >= GAME_CONFIG.requiredScore ? 'Уровень пройден!' : 'Попробуйте еще раз';
     document.getElementById('correct-answers').textContent = `${gameState.score}/${gameState.currentLevel.questions.length}`;
-    
-    // ИСПРАВЛЕННОЕ ОТОБРАЖЕНИЕ ОПЫТА:
-    let expText = `+${expEarned}`;
-    if (bonusExp > 0) expText += ` (+${bonusExp} бонус)`;
-    if (levelCompleted) expText += ` +${gameState.currentLevel.reward_points} (уровень)`;
-    
-    document.getElementById('exp-earned').textContent = expText;
+    document.getElementById('exp-earned').textContent = `+${expEarned}${bonusExp ? ` (+${bonusExp} бонус)` : ''}`;
     document.getElementById('best-score').textContent = `${bestScore}%`;
 
     const achievementsContainer = document.getElementById('achievements');
@@ -614,14 +609,14 @@ function showResults(score, expEarned, bonusExp, levelCompleted, timeSpent) {
 
     let newAchievements = 0;
 
-    if (levelCompleted) {
-        const achievement = createAchievementElement(ACHIEVEMENTS.first_level, true);
+    if (isPerfect) {
+        const achievement = createAchievementElement(ACHIEVEMENTS.perfect_score, true);
         achievementsContainer.appendChild(achievement);
         newAchievements++;
     }
 
-    if (gameState.score === gameState.currentLevel.questions.length) {
-        const achievement = createAchievementElement(ACHIEVEMENTS.perfect_score, true);
+    if (!window.gameProgress.levels[gameState.currentLevel.id]?.completed && score >= GAME_CONFIG.requiredScore) {
+        const achievement = createAchievementElement(ACHIEVEMENTS.first_level, true);
         achievementsContainer.appendChild(achievement);
         newAchievements++;
     }
@@ -736,37 +731,3 @@ function registerServiceWorker() {
 // Глобальные функции для HTML
 window.startLevel = startLevel;
 window.selectAnswer = selectAnswer;
-
-// Добавьте в конец script.js
-window.debugNextButton = function() {
-    const nextBtn = document.getElementById('next-btn');
-    console.log('Debug next button:', nextBtn);
-    console.log('onclick:', nextBtn.onclick);
-    
-    // Принудительно вызовем nextQuestion
-    alert('Принудительный вызов nextQuestion');
-    nextQuestion();
-};
-
-// Добавим временную кнопку для теста
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        const testBtn = document.createElement('button');
-        testBtn.textContent = 'ТЕСТ: Принудительно Продолжить';
-        testBtn.style.position = 'fixed';
-        testBtn.style.bottom = '10px';
-        testBtn.style.right = '10px';
-        testBtn.style.zIndex = '9999';
-        testBtn.style.background = 'orange';
-        testBtn.style.color = 'white';
-        testBtn.style.padding = '10px';
-        testBtn.onclick = function() {
-            if (typeof nextQuestion === 'function') {
-                nextQuestion();
-            } else {
-                alert('nextQuestion не найдена');
-            }
-        };
-        document.body.appendChild(testBtn);
-    }, 3000);
-});
