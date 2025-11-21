@@ -532,76 +532,21 @@ function nextQuestion() {
     }
 }
 
-async function finishLevel() {
-    const level = gameState.currentLevel;
-    const totalQuestions = level.questions.length;
-    const scorePercentage = Math.round((gameState.score / totalQuestions) * 100);
-    const expEarned = gameState.score * GAME_CONFIG.expPerCorrectAnswer;
-    const isPerfect = gameState.score === totalQuestions;
-    const bonusExp = isPerfect ? GAME_CONFIG.bonusExpPerfect : 0;
-    const totalExp = expEarned + bonusExp + level.reward_points;
-
-    const timeSpent = Math.round((Date.now() - gameState.startTime) / 1000);
-    window.gameProgress.totalPlayTime = (window.gameProgress.totalPlayTime || 0) + timeSpent;
-
-    // Сохраняем результат в бэкенд
-    await saveAttemptToBackend(level.id, gameState.score, 'completed');
-
-    const levelProgress = window.gameProgress.levels[level.id] || {
-        completed: false,
-        bestScore: 0,
-        playCount: 0,
-        totalTime: 0
-    };
-
-    levelProgress.playCount = (levelProgress.playCount || 0) + 1;
-    levelProgress.totalTime = (levelProgress.totalTime || 0) + timeSpent;
-    levelProgress.lastScore = scorePercentage;
-
-    if (scorePercentage >= GAME_CONFIG.requiredScore) {
-        levelProgress.completed = true;
-        if (scorePercentage > levelProgress.bestScore) {
-            levelProgress.bestScore = scorePercentage;
-        }
-        if (!window.gameProgress.levels[level.id]?.completed) {
-            window.gameProgress.completedLevels++;
-            checkAchievements('first_level');
-        }
-    }
-
-    window.gameProgress.levels[level.id] = levelProgress;
-    window.gameProgress.totalExp += totalExp;
-
-    if (isPerfect) checkAchievements('perfect_score');
-    if (timeSpent < 120) checkAchievements('fast_learner');
-    if (window.gameProgress.totalExp >= 500) checkAchievements('exp_500');
-    if (window.gameProgress.completedLevels >= 3) checkAchievements('all_levels'); // 3 уровня из бэкенда
-
-    const newUserLevel = Math.floor(window.gameProgress.totalExp / GAME_CONFIG.expPerLevel) + 1;
-    if (newUserLevel > window.gameProgress.userLevel) {
-        window.gameProgress.userLevel = newUserLevel;
-        showNotification(`🎉 Поздравляем! Вы достигли ${newUserLevel} уровня!`);
-    }
-
-    saveProgress();
-
-    // 🔊 Звук при успешном прохождении
-    if (scorePercentage >= GAME_CONFIG.requiredScore) {
-        playLevelCompleteSound();
-    }
-
-    showResults(scorePercentage, totalExp, bonusExp, isPerfect, timeSpent);
-}
-
-function showResults(score, expEarned, bonusExp, isPerfect, timeSpent) {
+finishLevel()
+function showResults(score, expEarned, bonusExp, levelCompleted, timeSpent) {
     const levelProgress = window.gameProgress.levels[gameState.currentLevel.id];
     const bestScore = levelProgress?.bestScore || 0;
 
-    document.getElementById('result-icon').textContent = score >= GAME_CONFIG.requiredScore ? '🎉' : '😔';
-    document.getElementById('result-title').textContent =
-        score >= GAME_CONFIG.requiredScore ? 'Уровень пройден!' : 'Попробуйте еще раз';
+    document.getElementById('result-icon').textContent = levelCompleted ? '🎉' : '😔';
+    document.getElementById('result-title').textContent = levelCompleted ? 'Уровень пройден!' : 'Попробуйте еще раз';
     document.getElementById('correct-answers').textContent = `${gameState.score}/${gameState.currentLevel.questions.length}`;
-    document.getElementById('exp-earned').textContent = `+${expEarned}${bonusExp ? ` (+${bonusExp} бонус)` : ''}`;
+    
+    // ИСПРАВЛЕННОЕ ОТОБРАЖЕНИЕ ОПЫТА:
+    let expText = `+${expEarned}`;
+    if (bonusExp > 0) expText += ` (+${bonusExp} бонус)`;
+    if (levelCompleted) expText += ` +${gameState.currentLevel.reward_points} (уровень)`;
+    
+    document.getElementById('exp-earned').textContent = expText;
     document.getElementById('best-score').textContent = `${bestScore}%`;
 
     const achievementsContainer = document.getElementById('achievements');
@@ -609,14 +554,14 @@ function showResults(score, expEarned, bonusExp, isPerfect, timeSpent) {
 
     let newAchievements = 0;
 
-    if (isPerfect) {
-        const achievement = createAchievementElement(ACHIEVEMENTS.perfect_score, true);
+    if (levelCompleted) {
+        const achievement = createAchievementElement(ACHIEVEMENTS.first_level, true);
         achievementsContainer.appendChild(achievement);
         newAchievements++;
     }
 
-    if (!window.gameProgress.levels[gameState.currentLevel.id]?.completed && score >= GAME_CONFIG.requiredScore) {
-        const achievement = createAchievementElement(ACHIEVEMENTS.first_level, true);
+    if (gameState.score === gameState.currentLevel.questions.length) {
+        const achievement = createAchievementElement(ACHIEVEMENTS.perfect_score, true);
         achievementsContainer.appendChild(achievement);
         newAchievements++;
     }
