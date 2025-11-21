@@ -511,23 +511,47 @@ function selectAnswer(answerIndex) {
     const feedback = document.getElementById('feedback');
     const feedbackIcon = document.getElementById('feedback-icon');
     const feedbackText = document.getElementById('feedback-text');
+    const nextBtn = document.getElementById('next-btn');
 
     feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
     feedbackIcon.textContent = isCorrect ? '✅' : '❌';
     feedbackText.textContent = question.explanation;
     feedback.classList.remove('hidden');
 
-    document.getElementById('next-btn').onclick = nextQuestion;
+    // ДИАГНОСТИКА
+    console.log('Setting next button handler...');
+    console.log('Next button element:', nextBtn);
+    console.log('nextQuestion function:', typeof nextQuestion);
+    
+    // Установка обработчика
+    nextBtn.onclick = function() {
+        console.log('Next button clicked!');
+        nextQuestion();
+    };
+    
+    // Принудительно покажем фидбек
+    feedback.style.display = 'block';
+    feedback.style.visibility = 'visible';
+    feedback.style.opacity = '1';
+    
+    console.log('Feedback setup complete');
 }
 
 function nextQuestion() {
+    console.log('nextQuestion called! Current question:', gameState.currentQuestion);
+    
     gameState.currentQuestion++;
     gameState.selectedAnswer = null;
     gameState.showFeedback = false;
 
+    console.log('Next question index:', gameState.currentQuestion);
+    console.log('Total questions:', gameState.currentLevel.questions.length);
+
     if (gameState.currentQuestion < gameState.currentLevel.questions.length) {
+        console.log('Rendering next question');
         renderQuestion();
     } else {
+        console.log('Finishing level');
         finishLevel();
     }
 }
