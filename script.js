@@ -834,6 +834,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // Добавим обработчик для проверки фидбека
     setTimeout(debugFeedback, 1000);
 });
+// ЭКСТРЕННЫЙ ФИКС - принудительно показываем фидбек
+function forceShowFeedback() {
+    const feedback = document.getElementById('feedback');
+    if (feedback) {
+        console.log('Force showing feedback');
+        feedback.style.display = 'block';
+        feedback.style.visibility = 'visible';
+        feedback.style.opacity = '1';
+        feedback.classList.remove('hidden');
+    }
+}
+
+// Обновим функцию selectAnswer
+function selectAnswer(answerIndex) {
+    if (gameState.showFeedback) return;
+
+    gameState.selectedAnswer = answerIndex;
+    gameState.showFeedback = true;
+
+    const question = gameState.currentLevel.questions[gameState.currentQuestion];
+    const isCorrect = answerIndex === question.correctAnswer;
+
+    // ... существующий код ...
+
+    // Показ фидбека
+    const feedback = document.getElementById('feedback');
+    const feedbackIcon = document.getElementById('feedback-icon');
+    const feedbackText = document.getElementById('feedback-text');
+    const nextBtn = document.getElementById('next-btn');
+
+    feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+    feedbackIcon.textContent = isCorrect ? '✅' : '❌';
+    feedbackText.textContent = question.explanation;
+    
+    // ПРИНУДИТЕЛЬНОЕ ОТОБРАЖЕНИЕ
+    feedback.style.display = 'block';
+    feedback.style.visibility = 'visible';
+    feedback.style.opacity = '1';
+    feedback.classList.remove('hidden');
+
+    // Установка обработчика
+    nextBtn.onclick = nextQuestion;
+    
+    console.log('Feedback setup complete', feedback.style.display);
+}
+
+// Также добавим проверку при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - checking elements');
+    
+    // Проверим все элементы через 2 секунды
+    setTimeout(() => {
+        const feedback = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        console.log('Feedback element:', feedback);
+        console.log('Next button:', nextBtn);
+        
+        if (feedback) {
+            console.log('Feedback styles:', window.getComputedStyle(feedback));
+        }
+    }, 2000);
+});
+
 // Глобальные функции для HTML
 window.startLevel = startLevel;
 window.selectAnswer = selectAnswer;
