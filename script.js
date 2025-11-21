@@ -1,3 +1,53 @@
+// БАЗОВАЯ ПРОВЕРКА РАБОТОСПОСОБНОСТИ
+console.log('=== SCRIPT.JS LOADED ===');
+
+// Простая проверка что функции доступны
+window.testGame = function() {
+    alert('Игра работает! Функции доступны.');
+    return 'Game is working';
+};
+
+// Проверка элементов DOM
+function checkDOMElements() {
+    console.log('Checking DOM elements...');
+    const elements = [
+        'app', 'loading', 'main-menu', 'level-screen', 
+        'question-container', 'feedback', 'next-btn'
+    ];
+    
+    elements.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`${id}:`, element ? 'FOUND' : 'NOT FOUND');
+    });
+}
+
+// Запустим проверку при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired');
+    checkDOMElements();
+    
+    // Простая кнопка для теста
+    const testButton = document.createElement('button');
+    testButton.textContent = 'ТЕСТ: Проверить игру';
+    testButton.style.position = 'fixed';
+    testButton.style.top = '10px';
+    testButton.style.right = '10px';
+    testButton.style.zIndex = '9999';
+    testButton.style.background = 'red';
+    testButton.style.color = 'white';
+    testButton.style.padding = '10px';
+    testButton.onclick = function() {
+        alert('JavaScript работает!');
+        if (typeof startLevel === 'function') {
+            alert('Функция startLevel доступна');
+        } else {
+            alert('Функция startLevel НЕ доступна');
+        }
+    };
+    document.body.appendChild(testButton);
+});
+
+
 // === БЕЗОПАСНЫЙ ЗВУКОВОЙ ФИДБЭК ===
 let audioCtx = null;
 let isAudioEnabled = false;
