@@ -1,53 +1,3 @@
-// БАЗОВАЯ ПРОВЕРКА РАБОТОСПОСОБНОСТИ
-console.log('=== SCRIPT.JS LOADED ===');
-
-// Простая проверка что функции доступны
-window.testGame = function() {
-    alert('Игра работает! Функции доступны.');
-    return 'Game is working';
-};
-
-// Проверка элементов DOM
-function checkDOMElements() {
-    console.log('Checking DOM elements...');
-    const elements = [
-        'app', 'loading', 'main-menu', 'level-screen', 
-        'question-container', 'feedback', 'next-btn'
-    ];
-    
-    elements.forEach(id => {
-        const element = document.getElementById(id);
-        console.log(`${id}:`, element ? 'FOUND' : 'NOT FOUND');
-    });
-}
-
-// Запустим проверку при загрузке
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded fired');
-    checkDOMElements();
-    
-    // Простая кнопка для теста
-    const testButton = document.createElement('button');
-    testButton.textContent = 'ТЕСТ: Проверить игру';
-    testButton.style.position = 'fixed';
-    testButton.style.top = '10px';
-    testButton.style.right = '10px';
-    testButton.style.zIndex = '9999';
-    testButton.style.background = 'red';
-    testButton.style.color = 'white';
-    testButton.style.padding = '10px';
-    testButton.onclick = function() {
-        alert('JavaScript работает!');
-        if (typeof startLevel === 'function') {
-            alert('Функция startLevel доступна');
-        } else {
-            alert('Функция startLevel НЕ доступна');
-        }
-    };
-    document.body.appendChild(testButton);
-});
-
-
 // === БЕЗОПАСНЫЙ ЗВУКОВОЙ ФИДБЭК ===
 let audioCtx = null;
 let isAudioEnabled = false;
@@ -164,28 +114,6 @@ async function loadLevelsFromBackend() {
                         ],
                         correctAnswer: 0,
                         explanation: "Банковский вклад защищен системой страхования вкладов и имеет предсказываемую доходность."
-                    },
-                    {
-                        question: "Что выгоднее: копить деньги под подушкой или на банковском вкладе?",
-                        answers: [
-                            "На банковском вкладе - есть процентный доход",
-                            "Под подушкой - нет рисков",
-                            "Не имеет значения",
-                            "Зависит от суммы"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "На банковском вкладе деньги защищены от инфляции и приносят дополнительный доход в виде процентов."
-                    },
-                    {
-                        question: "Какой минимальный размер финансовой подушки рекомендуется?",
-                        answers: [
-                            "3-6 месячных расходов",
-                            "1 месячный доход",
-                            "10 000 рублей",
-                            "Зависит от желаний"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Финансовая подушка в размере 3-6 месячных расходов позволяет комфортно пережить непредвиденные ситуации."
                     }
                 ]
             },
@@ -206,39 +134,6 @@ async function loadLevelsFromBackend() {
                         ],
                         correctAnswer: 0,
                         explanation: "Реквизиты банковской карты (номер, срок действия, CVC) - это конфиденциальная информация, которую нельзя сообщать посторонним."
-                    },
-                    {
-                        question: "Как защититься от фишинговых сайтов?",
-                        answers: [
-                            "Проверять адресную строку и SSL-сертификат",
-                            "Никогда не заходить в интернет-банк",
-                            "Использовать только мобильное приложение",
-                            "Сохранять пароли в браузере"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Всегда проверяйте адрес сайта (должен начинаться с https://) и наличие SSL-сертификата (замок в адресной строке)."
-                    },
-                    {
-                        question: "Что делать при утере банковской карты?",
-                        answers: [
-                            "Немедленно заблокировать через банк",
-                            "Подождать 24 часа",
-                            "Написать заявление в полицию",
-                            "Ничего, карта заблокируется сама"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Карту нужно заблокировать немедленно через мобильное приложение банка или по телефону горячей линии."
-                    },
-                    {
-                        question: "Какой пароль считается надежным?",
-                        answers: [
-                            "Комбинация букв, цифр и спецсимволов длиной от 8 символов",
-                            "Простое слово из словаря",
-                            "Дата рождения",
-                            "Одинаковый для всех сервисов"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Надежный пароль содержит не менее 8 символов, включая заглавные и строчные буквы, цифры и специальные символы."
                     }
                 ]
             },
@@ -259,39 +154,6 @@ async function loadLevelsFromBackend() {
                         ],
                         correctAnswer: 0,
                         explanation: "SMART - это аббревиатура для постановки эффективных целей: Specific, Measurable, Achievable, Relevant, Time-bound."
-                    },
-                    {
-                        question: "Как правильно распределить доходы?",
-                        answers: [
-                            "50% - necessities, 30% - wants, 20% - savings",
-                            "100% на текущие расходы",
-                            "70% на развлечения, 30% на еду",
-                            "Зависит от настроения"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Правило 50/30/20 помогает сбалансировать текущие расходы, удовольствия и финансовые цели."
-                    },
-                    {
-                        question: "Что такое инвестиционный горизонт?",
-                        answers: [
-                            "Период времени для достижения финансовой цели",
-                            "Максимальная сумма инвестиций",
-                            "Количество инвестиционных инструментов",
-                            "География инвестиций"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Инвестиционный горизонт определяет, на какой срок вы готовы вложить деньги, что влияет на выбор инструментов."
-                    },
-                    {
-                        question: "Какой первый шаг в финансовом планировании?",
-                        answers: [
-                            "Анализ текущей финансовой ситуации",
-                            "Открытие брокерского счета",
-                            "Покупка недвижимости",
-                            "Взятие кредита"
-                        ],
-                        correctAnswer: 0,
-                        explanation: "Прежде чем строить планы, нужно понять текущее положение: доходы, расходы, активы и обязательства."
                     }
                 ]
             }
@@ -655,26 +517,17 @@ function selectAnswer(answerIndex) {
     feedbackText.textContent = question.explanation;
     feedback.classList.remove('hidden');
 
-    // УБЕДИТЕСЬ ЧТО ОБРАБОТЧИК УСТАНОВЛЕН ПРАВИЛЬНО:
-    console.log('Setting next button handler');
     document.getElementById('next-btn').onclick = nextQuestion;
 }
 
 function nextQuestion() {
-    console.log('nextQuestion called, current:', gameState.currentQuestion);
-    
     gameState.currentQuestion++;
     gameState.selectedAnswer = null;
     gameState.showFeedback = false;
 
-    console.log('next question will be:', gameState.currentQuestion);
-    console.log('total questions:', gameState.currentLevel.questions.length);
-
     if (gameState.currentQuestion < gameState.currentLevel.questions.length) {
-        console.log('rendering next question');
         renderQuestion();
     } else {
-        console.log('finishing level');
         finishLevel();
     }
 }
@@ -683,20 +536,16 @@ async function finishLevel() {
     const level = gameState.currentLevel;
     const totalQuestions = level.questions.length;
     const scorePercentage = Math.round((gameState.score / totalQuestions) * 100);
-    
-    // ИСПРАВЛЕННАЯ ЛОГИКА НАЧИСЛЕНИЯ ОПЫТА:
     const expEarned = gameState.score * GAME_CONFIG.expPerCorrectAnswer;
     const isPerfect = gameState.score === totalQuestions;
     const bonusExp = isPerfect ? GAME_CONFIG.bonusExpPerfect : 0;
-    const levelCompleted = scorePercentage >= GAME_CONFIG.requiredScore;
-    const levelReward = levelCompleted ? level.reward_points : 0; // Награда только за прохождение
-    const totalExp = expEarned + bonusExp + levelReward;
+    const totalExp = expEarned + bonusExp + level.reward_points;
 
     const timeSpent = Math.round((Date.now() - gameState.startTime) / 1000);
     window.gameProgress.totalPlayTime = (window.gameProgress.totalPlayTime || 0) + timeSpent;
 
     // Сохраняем результат в бэкенд
-    await saveAttemptToBackend(level.id, gameState.score, levelCompleted ? 'completed' : 'failed');
+    await saveAttemptToBackend(level.id, gameState.score, 'completed');
 
     const levelProgress = window.gameProgress.levels[level.id] || {
         completed: false,
@@ -709,7 +558,6 @@ async function finishLevel() {
     levelProgress.totalTime = (levelProgress.totalTime || 0) + timeSpent;
     levelProgress.lastScore = scorePercentage;
 
-    // ИСПРАВЛЕННАЯ ЛОГИКА ПРОГРЕССА:
     if (scorePercentage >= GAME_CONFIG.requiredScore) {
         levelProgress.completed = true;
         if (scorePercentage > levelProgress.bestScore) {
@@ -719,9 +567,6 @@ async function finishLevel() {
             window.gameProgress.completedLevels++;
             checkAchievements('first_level');
         }
-    } else {
-        // Не обновляем bestScore если уровень не пройден
-        levelProgress.completed = false;
     }
 
     window.gameProgress.levels[level.id] = levelProgress;
@@ -730,7 +575,7 @@ async function finishLevel() {
     if (isPerfect) checkAchievements('perfect_score');
     if (timeSpent < 120) checkAchievements('fast_learner');
     if (window.gameProgress.totalExp >= 500) checkAchievements('exp_500');
-    if (window.gameProgress.completedLevels >= 3) checkAchievements('all_levels');
+    if (window.gameProgress.completedLevels >= 3) checkAchievements('all_levels'); // 3 уровня из бэкенда
 
     const newUserLevel = Math.floor(window.gameProgress.totalExp / GAME_CONFIG.expPerLevel) + 1;
     if (newUserLevel > window.gameProgress.userLevel) {
@@ -741,30 +586,49 @@ async function finishLevel() {
     saveProgress();
 
     // 🔊 Звук при успешном прохождении
-    if (levelCompleted) {
+    if (scorePercentage >= GAME_CONFIG.requiredScore) {
         playLevelCompleteSound();
     }
 
-    showResults(scorePercentage, totalExp, bonusExp, levelCompleted, timeSpent);
+    showResults(scorePercentage, totalExp, bonusExp, isPerfect, timeSpent);
 }
 
-function showResults(score, expEarned, bonusExp, levelCompleted, timeSpent) {
+function showResults(score, expEarned, bonusExp, isPerfect, timeSpent) {
     const levelProgress = window.gameProgress.levels[gameState.currentLevel.id];
     const bestScore = levelProgress?.bestScore || 0;
 
-    document.getElementById('result-icon').textContent = levelCompleted ? '🎉' : '😔';
-    document.getElementById('result-title').textContent = levelCompleted ? 'Уровень пройден!' : 'Попробуйте еще раз';
+    document.getElementById('result-icon').textContent = score >= GAME_CONFIG.requiredScore ? '🎉' : '😔';
+    document.getElementById('result-title').textContent =
+        score >= GAME_CONFIG.requiredScore ? 'Уровень пройден!' : 'Попробуйте еще раз';
     document.getElementById('correct-answers').textContent = `${gameState.score}/${gameState.currentLevel.questions.length}`;
-    
-    // ИСПРАВЛЕННОЕ ОТОБРАЖЕНИЕ ОПЫТА:
-    let expText = `+${expEarned}`;
-    if (bonusExp > 0) expText += ` (+${bonusExp} бонус)`;
-    if (levelCompleted) expText += ` +${gameState.currentLevel.reward_points} (уровень)`;
-    
-    document.getElementById('exp-earned').textContent = expText;
+    document.getElementById('exp-earned').textContent = `+${expEarned}${bonusExp ? ` (+${bonusExp} бонус)` : ''}`;
     document.getElementById('best-score').textContent = `${bestScore}%`;
 
-    // ... остальной код без изменений
+    const achievementsContainer = document.getElementById('achievements');
+    achievementsContainer.innerHTML = '';
+
+    let newAchievements = 0;
+
+    if (isPerfect) {
+        const achievement = createAchievementElement(ACHIEVEMENTS.perfect_score, true);
+        achievementsContainer.appendChild(achievement);
+        newAchievements++;
+    }
+
+    if (!window.gameProgress.levels[gameState.currentLevel.id]?.completed && score >= GAME_CONFIG.requiredScore) {
+        const achievement = createAchievementElement(ACHIEVEMENTS.first_level, true);
+        achievementsContainer.appendChild(achievement);
+        newAchievements++;
+    }
+
+    const achievementsSection = document.getElementById('achievements-container');
+    achievementsSection.style.display = newAchievements > 0 ? 'block' : 'none';
+
+    if (newAchievements > 0) {
+        showNotification(`🎖️ Получено ${newAchievements} нов${newAchievements === 1 ? 'ое' : 'ых'} достижения!`);
+    }
+
+    showScreen('results-screen');
 }
 
 function createAchievementElement(achievement, isNew = false) {
@@ -863,89 +727,6 @@ function registerServiceWorker() {
             .catch(err => console.log('❌ Ошибка Service Worker:', err));
     }
 }
-// Временная функция для отладки - добавьте в конец script.js
-function debugFeedback() {
-    console.log('=== DEBUG FEEDBACK ===');
-    const feedback = document.getElementById('feedback');
-    const nextBtn = document.getElementById('next-btn');
-    
-    console.log('Feedback element:', feedback);
-    console.log('Feedback classes:', feedback.className);
-    console.log('Next button:', nextBtn);
-    console.log('Next button onclick:', nextBtn.onclick);
-    
-    // Принудительно покажем фидбек
-    feedback.classList.remove('hidden');
-    console.log('Feedback after removing hidden:', feedback.className);
-}
-
-// Вызовем отладку при загрузке
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавим обработчик для проверки фидбека
-    setTimeout(debugFeedback, 1000);
-});
-// ЭКСТРЕННЫЙ ФИКС - принудительно показываем фидбек
-function forceShowFeedback() {
-    const feedback = document.getElementById('feedback');
-    if (feedback) {
-        console.log('Force showing feedback');
-        feedback.style.display = 'block';
-        feedback.style.visibility = 'visible';
-        feedback.style.opacity = '1';
-        feedback.classList.remove('hidden');
-    }
-}
-
-// Обновим функцию selectAnswer
-function selectAnswer(answerIndex) {
-    if (gameState.showFeedback) return;
-
-    gameState.selectedAnswer = answerIndex;
-    gameState.showFeedback = true;
-
-    const question = gameState.currentLevel.questions[gameState.currentQuestion];
-    const isCorrect = answerIndex === question.correctAnswer;
-
-    // ... существующий код ...
-
-    // Показ фидбека
-    const feedback = document.getElementById('feedback');
-    const feedbackIcon = document.getElementById('feedback-icon');
-    const feedbackText = document.getElementById('feedback-text');
-    const nextBtn = document.getElementById('next-btn');
-
-    feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-    feedbackIcon.textContent = isCorrect ? '✅' : '❌';
-    feedbackText.textContent = question.explanation;
-    
-    // ПРИНУДИТЕЛЬНОЕ ОТОБРАЖЕНИЕ
-    feedback.style.display = 'block';
-    feedback.style.visibility = 'visible';
-    feedback.style.opacity = '1';
-    feedback.classList.remove('hidden');
-
-    // Установка обработчика
-    nextBtn.onclick = nextQuestion;
-    
-    console.log('Feedback setup complete', feedback.style.display);
-}
-
-// Также добавим проверку при загрузке
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded - checking elements');
-    
-    // Проверим все элементы через 2 секунды
-    setTimeout(() => {
-        const feedback = document.getElementById('feedback');
-        const nextBtn = document.getElementById('next-btn');
-        console.log('Feedback element:', feedback);
-        console.log('Next button:', nextBtn);
-        
-        if (feedback) {
-            console.log('Feedback styles:', window.getComputedStyle(feedback));
-        }
-    }, 2000);
-});
 
 // Глобальные функции для HTML
 window.startLevel = startLevel;
