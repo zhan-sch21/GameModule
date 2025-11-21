@@ -813,7 +813,27 @@ function registerServiceWorker() {
             .catch(err => console.log('❌ Ошибка Service Worker:', err));
     }
 }
+// Временная функция для отладки - добавьте в конец script.js
+function debugFeedback() {
+    console.log('=== DEBUG FEEDBACK ===');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    
+    console.log('Feedback element:', feedback);
+    console.log('Feedback classes:', feedback.className);
+    console.log('Next button:', nextBtn);
+    console.log('Next button onclick:', nextBtn.onclick);
+    
+    // Принудительно покажем фидбек
+    feedback.classList.remove('hidden');
+    console.log('Feedback after removing hidden:', feedback.className);
+}
 
+// Вызовем отладку при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    // Добавим обработчик для проверки фидбека
+    setTimeout(debugFeedback, 1000);
+});
 // Глобальные функции для HTML
 window.startLevel = startLevel;
 window.selectAnswer = selectAnswer;
