@@ -605,17 +605,26 @@ function selectAnswer(answerIndex) {
     feedbackText.textContent = question.explanation;
     feedback.classList.remove('hidden');
 
+    // УБЕДИТЕСЬ ЧТО ОБРАБОТЧИК УСТАНОВЛЕН ПРАВИЛЬНО:
+    console.log('Setting next button handler');
     document.getElementById('next-btn').onclick = nextQuestion;
 }
 
 function nextQuestion() {
+    console.log('nextQuestion called, current:', gameState.currentQuestion);
+    
     gameState.currentQuestion++;
     gameState.selectedAnswer = null;
     gameState.showFeedback = false;
 
+    console.log('next question will be:', gameState.currentQuestion);
+    console.log('total questions:', gameState.currentLevel.questions.length);
+
     if (gameState.currentQuestion < gameState.currentLevel.questions.length) {
+        console.log('rendering next question');
         renderQuestion();
     } else {
+        console.log('finishing level');
         finishLevel();
     }
 }
