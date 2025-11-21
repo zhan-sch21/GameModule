@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Финансовая Грамотность - Игра</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Игровой модуль финансовой грамотности - учитесь управлять деньгами через увлекательные игры">
+</head>
+<body>
+    <div id="app">
+        <!-- Экран загрузки -->
+        <div id="loading" class="screen active">
+            <div class="loader">
+                <div class="loader-icon">💰</div>
+                <h1>Финансовая Грамотность</h1>
+                <p>Загружаем ваши знания...</p>
+                <div class="progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="loading-progress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Главное меню -->
+        <div id="main-menu" class="screen">
+            <header class="header">
+                <div class="app-title">
+                    <h1>💰 Финансовая Грамотность</h1>
+                    <p class="subtitle">Игровой обучающий модуль</p>
+                </div>
+                <div class="user-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="total-exp">0</span>
+                        <span class="stat-label">Опыт</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="completed-levels">0</span>
+                        <span class="stat-label">Уровни</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="user-level">1</span>
+                        <span class="stat-label">Уровень</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="levels-container">
+                <h2>🎯 Выберите уровень</h2>
+                <div id="levels-list" class="levels-list">
+                    <!-- Уровень 1: Накопления -->
+                    <div class="level-card" data-level="savings">
+                        <div class="level-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2v20M2 12h20M5 8h14M5 16h14" />
+                                <circle cx="12" cy="12" r="9" />
+                            </svg>
+                        </div>
+                        <div class="level-content">
+                            <div class="level-topic-badge">Накопления</div>
+                            <h3 class="level-title">Основы накоплений</h3>
+                            <p class="level-desc">Как копить без усилий</p>
+                        </div>
+                        <div class="level-reward">+100 опыта</div>
+                        <button class="btn btn-secondary level-start-btn">🎮 Начать</button>
+                    </div>
+
+                    <!-- Уровень 2: Безопасность -->
+                    <div class="level-card" data-level="security">
+                        <div class="level-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2L3 7v10c0 5.55 3.84 9 9 9s9-3.45 9-9V7l-9-5z" />
+                                <path d="M12 12.5v7M9 11l3-3 3 3" />
+                            </svg>
+                        </div>
+                        <div class="level-content">
+                            <div class="level-topic-badge">Безопасность</div>
+                            <h3 class="level-title">Финансовая защита</h3>
+                            <p class="level-desc">От мошенников и рисков</p>
+                        </div>
+                        <div class="level-reward">+150 опыта</div>
+                        <button class="btn btn-secondary level-start-btn">🎮 Начать</button>
+                    </div>
+
+                    <!-- Уровень 3: Цели -->
+                    <div class="level-card" data-level="goals">
+                        <div class="level-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 8v4l2 2" />
+                            </svg>
+                        </div>
+                        <div class="level-content">
+                            <div class="level-topic-badge">Планирование</div>
+                            <h3 class="level-title">Финансовые цели</h3>
+                            <p class="level-desc">Ставьте и достигайте</p>
+                        </div>
+                        <div class="level-reward">+120 опыта</div>
+                        <button class="btn btn-secondary level-start-btn">🎮 Начать</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-actions">
+                <button id="profile-btn" class="btn btn-secondary">
+                    📊 Мой прогресс
+                </button>
+                <button id="help-btn" class="btn btn-secondary">
+                    ❓ Помощь
+                </button>
+            </div>
+        </div>
+
+        <!-- Экран уровня -->
+        <div id="level-screen" class="screen">
+            <div class="level-header">
+                <button id="back-btn" class="btn-back">← Назад</button>
+                <div class="level-info">
+                    <h2 id="level-title">Название уровня</h2>
+                    <div class="level-topic" id="level-topic"></div>
+                </div>
+                <div class="level-stats">
+                    <span id="level-progress">Вопрос 1/5</span>
+                </div>
+            </div>
+
+            <div class="game-container">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+
+                <div id="question-container" class="question-container">
+                    <!-- Контент вопроса будет добавляться через JS -->
+                </div>
+
+                <div id="feedback" class="feedback hidden">
+                    <div id="feedback-icon" class="feedback-icon"></div>
+                    <div class="feedback-content">
+                        <p id="feedback-text"></p>
+                        <button id="next-btn" class="btn btn-primary">Продолжить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран результатов -->
+        <div id="results-screen" class="screen">
+            <div class="results-container">
+                <div id="result-icon" class="result-icon">🎉</div>
+                <h2 id="result-title">Уровень пройден!</h2>
+
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <span class="stat-label">Правильные ответы</span>
+                        <span id="correct-answers" class="stat-value">0/0</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="stat-label">Начислено опыта</span>
+                        <span id="exp-earned" class="stat-value">+0</span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="stat-label">Лучший результат</span>
+                        <span id="best-score" class="stat-value">0%</span>
+                    </div>
+                </div>
+
+                <div class="achievements-container" id="achievements-container">
+                    <h3>🎖️ Достижения</h3>
+                    <div id="achievements" class="achievements">
+                        <!-- Достижения будут добавляться через JS -->
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button id="play-again-btn" class="btn btn-primary">🔄 Играть еще раз</button>
+                    <button id="menu-btn" class="btn btn-secondary">📋 В меню</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Профиль -->
+        <div id="profile-screen" class="screen">
+            <div class="profile-header">
+                <button id="profile-back-btn" class="btn-back">← Назад</button>
+                <h2>Мой прогресс</h2>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 2v20M2 12h20" />
+                                <circle cx="12" cy="12" r="9" />
+                            </svg>
+                        </div>
+                        <h3>Общий опыт</h3>
+                        <p id="profile-total-exp" class="stat-big">0</p>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M9 12l2 2 4-4M5 12h14" />
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                        </div>
+                        <h3>Пройдено уровней</h3>
+                        <p id="profile-levels-completed" class="stat-big">0</p>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 2l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6z" />
+                            </svg>
+                        </div>
+                        <h3>Достижения</h3>
+                        <p id="profile-achievements" class="stat-big">0</p>
+                    </div>
+                </div>
+
+                <div class="level-progress">
+                    <h3>Прогресс по уровням</h3>
+                    <div id="profile-levels-list" class="profile-levels-list">
+                        <!-- Будет заполняться JS -->
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button id="reset-progress-btn" class="btn btn-warning">Сбросить прогресс</button>
+                    <button id="export-data-btn" class="btn btn-secondary">Экспорт данных</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Помощь -->
+        <div id="help-screen" class="screen">
+            <div class="help-header">
+                <button id="help-back-btn" class="btn-back">← Назад</button>
+                <h2>Помощь</h2>
+            </div>
+
+            <div class="help-content">
+                <div class="help-section">
+                    <h3>Как играть</h3>
+                    <p>Проходите уровни, отвечая на вопросы по финансовой грамотности. Каждый правильный ответ приносит очки опыта.</p>
+                </div>
+
+                <div class="help-section">
+                    <h3>Система наград</h3>
+                    <ul class="rewards-list">
+                        <li><span class="reward-icon success">✓</span> <strong>Правильный ответ:</strong> +10 опыта</li>
+                        <li><span class="reward-icon bonus">★</span> <strong>Идеальный результат:</strong> +50 бонусных очков</li>
+                        <li><span class="reward-icon level">→</span> <strong>Прохождение уровня:</strong> награда зависит от сложности</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>Прогресс</h3>
+                    <p>Ваш прогресс сохраняется автоматически в браузере. Вы можете в любой момент продолжить с того места, где остановились.</p>
+                </div>
+
+                <div class="help-section">
+                    <h3>Уровни сложности</h3>
+                    <div class="difficulty-info">
+                        <div class="difficulty-item">
+                            <span class="difficulty-stars">★☆☆</span>
+                            <span>Начальный</span>
+                        </div>
+                        <div class="difficulty-item">
+                            <span class="difficulty-stars">★★☆</span>
+                            <span>Средний</span>
+                        </div>
+                        <div class="difficulty-item">
+                            <span class="difficulty-stars">★★★</span>
+                            <span>Продвинутый</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Уведомление -->
+        <div id="notification" class="notification hidden">
+            <div class="notification-content">
+                <span id="notification-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- или если нужно указать явный путь -->
+    <script src="./script.js"></script>
+</body>
+</html>

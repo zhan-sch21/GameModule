@@ -1,0 +1,7 @@
+[build]
+  publish = "/"  # или "./", если файлы в корне
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
